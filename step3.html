@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netflix - Plan Selection</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f3f3f3;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        
+        .logo {
+            padding: 20px;
+        }
+        
+        .logo svg {
+            height: 45px;
+            fill: #e50914;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+            padding: 20px;
+        }
+        
+        .plan-box {
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 800px;
+        }
+        
+        .steps {
+            color: #737373;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            font-size: 28px;
+            font-weight: 500;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .plan-options {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .plan-card {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+             padding: 20px;
+             flex: 1;
+             min-width: 200px;
+             position: relative;
+             transition: all 0.2s ease; /* Add smooth transition */
+             cursor: pointer; /* Change cursor to pointer */
+        }
+        
+        .plan-card:hover {
+           outline: 2px solid #e50914; /* Netflix red color */
+           transform: translateY(-2px); /* Slight lift effect */
+           box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add shadow on hover */
+       }
+       .plan-card.recommended:hover {
+         outline: 3px solid #e50914; /* Thicker outline for recommended */
+      }
+      .plan-card.selected {
+        outline: 2px solid #e50914;
+        background-color: #fff5f5; /* Light red background for selected */
+      }
+        .recommended-badge {
+            position: absolute;
+            top: -10px;
+            right: 10px;
+            background-color: #e50914;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .plan-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .plan-features {
+            list-style-type: none;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        
+        .plan-features li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .plan-features li:last-child {
+            border-bottom: none;
+        }
+        
+        .feature-title {
+            font-weight: bold;
+            display: block;
+            color: #333;
+        }
+        
+        .feature-value {
+            color: #737373;
+        }
+        
+        .disclaimer {
+            font-size: 12px;
+            color: #737373;
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+            line-height: 1.5;
+        }
+        
+        .next-button {
+            width: 100%;
+            padding: 12px;
+            background-color: #e50914;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            max-width: 400px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .next-button:hover {
+            background-color: #f6121d;
+        }
+    </style>
+</head>
+<body>
+    <div class="logo">
+        <svg viewBox="0 0 111 30" class="svg-icon svg-icon-netflix-logo" focusable="false">
+            <g id="netflix-logo">
+                <path d="M105.06233,14.2806261 L110.999156,30 C109.249227,29.7497422 107.500234,29.4366857 105.718437,29.1554972 L102.374168,20.4686475 L98.9371075,28.4375293 C97.2499766,28.1563408 95.5928391,28.061674 93.9057081,27.8432843 L99.9372012,14.0931671 L94.4680851,-5.68434189e-14 L99.5313525,-5.68434189e-14 L102.593495,7.87421502 L105.874965,-5.68434189e-14 L110.999156,-5.68434189e-14 L105.06233,14.2806261 Z M90.4686475,-5.68434189e-14 L85.8749649,-5.68434189e-14 L85.8749649,27.2499766 C87.3746368,27.3437061 88.9371075,27.4055675 90.4686475,27.5930265 L90.4686475,-5.68434189e-14 Z M81.9055207,26.93692 C77.7186241,26.6557316 73.5307901,26.4064111 69.250164,26.3117443 L69.250164,-5.68434189e-14 L73.9366389,-5.68434189e-14 L73.9366389,21.8745899 C76.6248008,21.9373887 79.3120255,22.1557784 81.9055207,22.2804387 L81.9055207,26.93692 Z M64.2496954,10.6561065 L64.2496954,15.3435186 L57.8442216,15.3435186 L57.8442216,25.9996251 L53.2186709,25.9996251 L53.2186709,-5.68434189e-14 L66.3436123,-5.68434189e-14 L66.3436123,4.68741213 L57.8442216,4.68741213 L57.8442216,10.6561065 L64.2496954,10.6561065 Z M45.3435186,4.68741213 L45.3435186,26.2498828 C43.7810479,26.2498828 42.1876465,26.2498828 40.6561065,26.3117443 L40.6561065,4.68741213 L35.8121661,4.68741213 L35.8121661,-5.68434189e-14 L50.2183897,-5.68434189e-14 L50.2183897,4.68741213 L45.3435186,4.68741213 Z M30.749836,15.5928391 C28.687787,15.5928391 26.2498828,15.5928391 24.4999531,15.6875059 L24.4999531,22.6562939 C27.2499766,22.4678976 30,22.2495079 32.7809542,22.1557784 L32.7809542,26.6557316 L19.812541,27.6876933 L19.812541,-5.68434189e-14 L32.7809542,-5.68434189e-14 L32.7809542,4.68741213 L24.4999531,4.68741213 L24.4999531,10.9991564 C26.3126816,10.9991564 29.0936358,10.9054269 30.749836,10.9054269 L30.749836,15.5928391 Z M4.78114163,12.9684132 L4.78114163,29.3429562 C3.09401069,29.5313525 1.59340144,29.7497422 0,30 L0,-5.68434189e-14 L4.4690224,-5.68434189e-14 L10.562377,17.0315868 L10.562377,-5.68434189e-14 L15.2497891,-5.68434189e-14 L15.2497891,28.061674 C13.5935889,28.3437998 11.906458,28.4375293 10.1246602,28.6868498 L4.78114163,12.9684132 Z"></path>
+            </g>
+        </svg>
+    </div>
+    
+    <div class="container">
+        <div class="plan-box">
+            <div class="steps">STEP 3 OF 3</div>
+            <h1>Choose your plan details</h1>
+            
+            <div class="plan-options">
+                <div class="plan-card">
+                    <div class="plan-name">Basic</div>
+                    <ul class="plan-features">
+                        <li>
+                            <span class="feature-title">Supported devices</span>
+                            <span class="feature-value">Mobile, tablet</span>
+                        </li>
+                        <li>
+                            <span class="feature-title">Simultaneous streams</span>
+                            <span class="feature-value">1</span>
+                        </li>
+                        <li>
+                            <span class="feature-title">Download devices</span>
+                            <span class="feature-value">1</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="plan-card">
+                    <div class="plan-name">Standard</div>
+                    <ul class="plan-features">
+                        <li>
+                            <span class="feature-title">Supported devices</span>
+                            <span class="feature-value">TV, computer, mobile, tablet</span>
+                        </li>
+                        <li>
+                            <span class="feature-title">Simultaneous streams</span>
+                            <span class="feature-value">2</span>
+                        </li>
+                        <li>
+                            <span class="feature-title">Download devices</span>
+                            <span class="feature-value">2</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="plan-card recommended">
+                    <div class="recommended-badge">Recommended</div>
+                    <div class="plan-name">Premium</div>
+                    <ul class="plan-features">
+                        <li>
+                            <span class="feature-title">Supported devices</span>
+                            <span class="feature-value">TV, computer, mobile, tablet</span>
+                        </li>
+                        <li>
+                            <span class="feature-title">Simultaneous streams</span>
+                            <span class="feature-value">4</span>
+                        </li>
+                        <li>
+                            <span class="feature-title">Download devices</span>
+                            <span class="feature-value">6</span>
+                        </li>
+                        <li>
+                            <span class="feature-title">Spatial audio</span>
+                            <span class="feature-value">Included</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <p class="disclaimer">
+                HD (720p), Full HD (1080p), Ultra HD (4K) and HDR availability subject to your internet service and device capabilities. Not all content is available in all resolutions.<br><br>
+                Only people who live with you may use your account. Watch on 4 different devices at the same time with Premium, 2 with Standard, and 1 with Basic.<br><br>
+                Live events are included with any plan and may contain ads.
+            </p>
+            
+            <button class="next-button" id="nextButton">Next</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const nextButton = document.getElementById('nextButton');
+            
+            nextButton.addEventListener('click', function() {
+                // Redirect to your dummy Netflix home page
+                window.location.href = 'home.html';
+            });
+            
+            // Optional: Add plan selection functionality
+            const planCards = document.querySelectorAll('.plan-card');
+            planCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    planCards.forEach(c => c.classList.remove('selected'));
+                    this.classList.add('selected');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

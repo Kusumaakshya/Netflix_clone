@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Netflix Clone</title>
+    <style>
+        body {
+            background-color: #141414;
+            color: white;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+        
+        /* Profile Navigation */
+        .profile-nav {
+            display: flex;
+            justify-content: flex-end;
+            padding: 20px 50px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 100%);
+        }
+        
+        .profile-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+            margin-left: 15px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            object-fit: cover;
+        }
+        
+        .profile-icon:hover {
+            border-color: white;
+            transform: scale(1.1);
+        }
+        
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 50px;
+            position: relative;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to top, #141414 0%, transparent 50%);
+        }
+        
+        .hero-content {
+            z-index: 1;
+            max-width: 600px;
+            margin-top: 100px;
+        }
+        
+        .hero-title {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .hero-description {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            line-height: 1.5;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .hero-buttons button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 4px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .play-btn {
+            background-color: white;
+            color: black;
+        }
+        
+        .play-btn:hover {
+            background-color: rgba(255,255,255,0.8);
+        }
+        
+        .info-btn {
+            background-color: rgba(109, 109, 110, 0.7);
+            color: white;
+        }
+        
+        .info-btn:hover {
+            background-color: rgba(109, 109, 110, 0.5);
+        }
+        
+        /* Movie Grid */
+        .movie-section {
+            padding: 30px 50px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        .movie-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .movie-card {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+            aspect-ratio: 2/3;
+            cursor: pointer;
+        }
+        
+        .movie-card:hover {
+            transform: scale(1.05);
+            z-index: 2;
+        }
+        
+        .movie-poster {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        /* Movie Details Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .modal-content {
+            background-color: #181818;
+            margin: 50px auto;
+            max-width: 800px;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .modal-header {
+            position: relative;
+            height: 400px;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .modal-header::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 150px;
+            background: linear-gradient(to top, #181818, transparent);
+        }
+        
+        .modal-body {
+            padding: 30px;
+            position: relative;
+            margin-top: -100px;
+            z-index: 1;
+        }
+        
+        .modal-title {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+        
+        .modal-meta {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+        
+        .match-score {
+            color: #46d369;
+            font-weight: bold;
+        }
+        
+        .year, .maturity-rating, .runtime {
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 0.9rem;
+        }
+        
+        .maturity-rating {
+            border: 1px solid rgba(255,255,255,0.4);
+        }
+        
+        .modal-description {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.5);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+        }
+        
+        /* Loading spinner */
+        .spinner {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1001;
+        }
+        
+        /* Remove scroll bars */
+        ::-webkit-scrollbar {
+            display: none;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .hero-content {
+                max-width: 100%;
+                margin-top: 150px;
+            }
+            
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .hero-description {
+                font-size: 1rem;
+            }
+            
+            .movie-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 20px auto;
+            }
+            
+            .modal-header {
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Profile Navigation -->
+    <div class="profile-nav">
+        <img src="https://randomuser.me/api/portraits/women/44.jpg" class="profile-icon" alt="Profile 1">
+        <img src="https://randomuser.me/api/portraits/men/32.jpg" class="profile-icon" alt="Profile 2">
+        <img src="https://randomuser.me/api/portraits/women/68.jpg" class="profile-icon" alt="Profile 3">
+        <img src="https://randomuser.me/api/portraits/men/75.jpg" class="profile-icon" alt="Profile 4">
+    </div>
+    
+    <!-- Hero Section -->
+    <div class="hero" id="heroSection">
+        <div class="hero-content">
+            <h1 class="hero-title" id="heroTitle">Stranger Things</h1>
+            <p class="hero-description" id="heroDescription">When a young boy vanishes, a small town uncovers a mystery involving secret experiments, terrifying supernatural forces and one strange little girl.</p>
+            <div class="hero-buttons">
+                <button class="play-btn" id="playBtn">▶ Play</button>
+                <button class="info-btn" id="infoBtn">ℹ More Info</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Movie Sections -->
+    <div class="movie-section">
+        <h2 class="section-title">Popular on Netflix</h2>
+        <div class="movie-grid" id="popularMovies"></div>
+    </div>
+    
+    <div class="movie-section">
+        <h2 class="section-title">Trending Now</h2>
+        <div class="movie-grid" id="trendingMovies"></div>
+    </div>
+    
+    <div class="movie-section">
+        <h2 class="section-title">New Releases</h2>
+        <div class="movie-grid" id="newReleases"></div>
+    </div>
+    
+    <!-- Loading Spinner -->
+    <div class="spinner" id="spinner">
+        <svg width="50" height="50" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="25" cy="25" r="20" stroke="rgba(255,255,255,0.3)" stroke-width="5" fill="none"></circle>
+            <circle cx="25" cy="25" r="20" stroke="#e50914" stroke-width="5" stroke-linecap="round" fill="none" stroke-dasharray="125" stroke-dashoffset="100">
+                <animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="1s" repeatCount="indefinite"></animateTransform>
+            </circle>
+        </svg>
+    </div>
+    
+    <!-- Movie Details Modal -->
+    <div class="modal" id="movieModal">
+        <div class="modal-content">
+            <div class="modal-header" id="modalHeader"></div>
+            <button class="modal-close" id="modalClose">&times;</button>
+            <div class="modal-body">
+                <h1 class="modal-title" id="modalTitle"></h1>
+                <div class="modal-meta">
+                    <span class="match-score" id="modalScore">97% Match</span>
+                    <span class="year" id="modalYear">2023</span>
+                    <span class="maturity-rating" id="modalRating">TV-MA</span>
+                    <span class="runtime" id="modalRuntime">2h 15m</span>
+                </div>
+                <p class="modal-description" id="modalDescription"></p>
+                <button class="play-btn" id="modalPlayBtn">▶ Play</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Unique list of 30 popular movies with YouTube trailer IDs
+        const movies = [
+            { id: 667538, title: 'Transformers: Rise of the Beasts', poster: '/2vFuG6bWGyQUzYS9d69E5l85nIz.jpg', youtubeId: 'itnqEauWQZM', year: 2023, rating: 'PG-13', runtime: '2h 7m', description: 'Optimus Prime and the Autobots take on their biggest challenge yet...', score: '96%' },
+            { id: 569094, title: 'Spider-Man: Across the Spider-Verse', poster: '/8Vt6mWEReuy4Of61Lnj5Xj704m8.jpg', youtubeId: 'cqGjhVJWtEg', year: 2023, rating: 'PG', runtime: '2h 20m', description: 'Miles Morales catapults across the Multiverse...', score: '95%' },
+            { id: 385687, title: 'Fast X', poster: '/fiVW06jE7z9YnO4trhaMEdclSiC.jpg', youtubeId: 'eoOaKN4qCKw', year: 2023, rating: 'PG-13', runtime: '2h 21m', description: 'Dom Toretto and his family face their most lethal opponent...', score: '84%' },
+            { id: 447365, title: 'Guardians of the Galaxy Vol. 3', poster: '/r2J02Z2OpNTctfOSN1Ydgii51I3.jpg', youtubeId: 'u3V5KDHRQvk', year: 2023, rating: 'PG-13', runtime: '2h 30m', description: 'The Guardians embark on one last mission to save Rocket...', score: '94%' },
+            { id: 502356, title: 'The Super Mario Bros. Movie', poster: '/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg', youtubeId: 'TnGl01FkMMo', year: 2023, rating: 'PG', runtime: '1h 32m', description: 'Mario embarks on an adventure to save Luigi and the Mushroom Kingdom...', score: '89%' },
+            { id: 603692, title: 'John Wick: Chapter 4', poster: '/vZloFAK7NmvMGKE7VkF5UHaz0I.jpg', youtubeId: 'qEVUtrk8_B4', year: 2023, rating: 'R', runtime: '2h 49m', description: 'John Wick uncovers a path to defeating The High Table...', score: '92%' },
+            { id: 505642, title: 'Black Panther: Wakanda Forever', poster: '/sv1xJUazXeYqALzczSZ3O6nkH75.jpg', youtubeId: 'RlOB3UALvrQ', year: 2022, rating: 'PG-13', runtime: '2h 41m', description: 'The people of Wakanda fight to protect their home...', score: '93%' },
+            { id: 76600, title: 'Avatar: The Way of Water', poster: '/t6HIqrRAclMCA60NsSmeqe9RmNV.jpg', youtubeId: 'd9MyW72ELq0', year: 2022, rating: 'PG-13', runtime: '3h 12m', description: 'Jake Sully and Neytiri fight to protect their family...', score: '91%' },
+            { id: 536554, title: 'M3GAN', poster: '/d9nBoowhjiiYc4FBNtQkPY7c11H.jpg', youtubeId: 'BRb4U99OU80', year: 2022, rating: 'PG-13', runtime: '1h 42m', description: 'A lifelike doll programmed to be a child\'s companion...', score: '88%' },
+            { id: 677179, title: 'Creed III', poster: '/cvsXj3I9Q2iyyIo95AecSd1tad7.jpg', youtubeId: 'H6MLJG0RdDE', year: 2023, rating: 'PG-13', runtime: '1h 56m', description: 'Adonis Creed faces a childhood friend turned boxing rival...', score: '90%' },
+            { id: 804150, title: 'Cocaine Bear', poster: '/gOnmaxHo0412UVr1QM5Nekv1xPi.jpg', youtubeId: 'DuWEEKeJLMI', year: 2023, rating: 'R', runtime: '1h 35m', description: 'A bear goes on a murderous rampage after ingesting cocaine...', score: '82%' },
+            { id: 758009, title: 'Shotgun Wedding', poster: '/t79ozwWnwekO0ADIzsFP1E5SkvR.jpg', youtubeId: 'A7fY5XEcH8U', year: 2022, rating: 'R', runtime: '1h 40m', description: 'A couple\'s wedding is hijacked by criminals...', score: '75%' },
+            { id: 594767, title: 'Shazam! Fury of the Gods', poster: '/A3ZbZsmsvNGdprRi2lKgGEeVLEH.jpg', youtubeId: 'AIc671o9yCI', year: 2023, rating: 'PG-13', runtime: '2h 10m', description: 'The Shazam family faces off against the daughters of Atlas...', score: '83%' },
+            { id: 739405, title: 'Operation Fortune: Ruse de Guerre', poster: '/uo7vWfQUlVwcg53IwDqXt0Yf5BM.jpg', youtubeId: 'a6nw7bJmQ4o', year: 2023, rating: 'R', runtime: '1h 54m', description: 'A spy must track down a deadly weapons deal...', score: '79%' },
+            { id: 677638, title: 'We Have a Ghost', poster: '/xo0fgAUoEeVQ7KsKeMWypyglvnf.jpg', youtubeId: '82I1ErFD63E', year: 2023, rating: 'PG-13', runtime: '2h 7m', description: 'A family discovers a ghost named Ernest living in their home...', score: '81%' },
+            { id: 830784, title: 'Lyle, Lyle, Crocodile', poster: '/irIS5Tn3TXjNi1R9BpWvGAN4CZ1.jpg', youtubeId: 'J6q1O9qeQrc', year: 2022, rating: 'PG', runtime: '1h 46m', description: 'A family discovers a singing crocodile living in their attic...', score: '78%' },
+            { id: 736790, title: 'Chupa', poster: '/ra3xm8KFAkwK0C9PeHfuwPnPw1Q.jpg', youtubeId: 'IEEbUzffzrk', year: 2023, rating: 'PG', runtime: '1h 35m', description: 'A boy discovers a mythical creature hiding on his grandfather\'s ranch...', score: '76%' },
+            { id: 772515, title: 'Huesera: The Bone Woman', poster: '/7NhG3NClQ1xrc3kEwTiwFht5Y3L.jpg', youtubeId: 'Qjpmysz4x-4', year: 2022, rating: 'R', runtime: '1h 33m', description: 'A woman is cursed by a sinister entity during her pregnancy...', score: '87%' },
+            { id: 758323, title: 'The Pope\'s Exorcist', poster: '/9JBEPLTPSm0d1mbEcLxULjJq9Eh.jpg', youtubeId: 'YqNYrYUiMfg', year: 2023, rating: 'R', runtime: '1h 43m', description: 'The Vatican\'s chief exorcist investigates a possession case...', score: '80%' },
+            { id: 843794, title: 'JUNG_E', poster: '/z2nfRxZCGFgAnVhb9pZO87TyTX5.jpg', youtubeId: '9W3KeD6sx8U', year: 2023, rating: 'TV-MA', runtime: '1h 38m', description: 'In a post-apocalyptic future, a scientist clones her mother\'s brain...', score: '85%' },
+            { id: 668482, title: 'Your Place or Mine', poster: '/ApkSeqfIPRCxOtfjXYYE6Ji7jVU.jpg', youtubeId: '4B5qmRMFKFA', year: 2023, rating: 'TV-14', runtime: '1h 49m', description: 'Two best friends swap homes and lives for a week...', score: '72%' },
+            { id: 842675, title: 'The Wandering Earth II', poster: '/pR858ihc6Ls9xohpdRJVjV787ml.jpg', youtubeId: 'mIeYFDBGJ_c', year: 2023, rating: 'PG-13', runtime: '2h 53m', description: 'Humans build massive engines to move Earth away from the dying sun...', score: '89%' },
+            { id: 772171, title: 'The Conference', poster: '/uUsiPZ65CrN6w7QJish2iVJ61nU.jpg', youtubeId: 'RjNcTBXTk4I', year: 2023, rating: 'TV-MA', runtime: '1h 42m', description: 'A team-building conference turns deadly when a killer appears...', score: '77%' },
+            { id: 799876, title: 'The Out-Laws', poster: '/5gijZg1I6gj7afOzcoH5nkK4mQx.jpg', youtubeId: 'mUtWzkyDkU0', year: 2023, rating: 'TV-MA', runtime: '1h 35m', description: 'A bank manager suspects his future in-laws are notorious thieves...', score: '74%' },
+            { id: 823999, title: 'Diabolik - Ginko Attacks', poster: '/8L7FE3bXjN98BcmKANzrL5WvUqT.jpg', youtubeId: 'XWIr6s6U1iY', year: 2022, rating: 'TV-MA', runtime: '2h 13m', description: 'The master thief Diabolik faces off against Inspector Ginko...', score: '83%' },
+            { id: 842544, title: 'Transfusion', poster: '/bxh5xCCW9Ynfg6EZJWUkc1zqTnr.jpg', youtubeId: 's0YJq3zQO1I', year: 2023, rating: 'R', runtime: '1h 46m', description: 'A former Special Forces operative plunges into the criminal underworld...', score: '81%' },
+            { id: 800597, title: 'Knock at the Cabin', poster: '/dm06L9pxDOL9jNSK4Cb6y139rrG.jpg', youtubeId: '98WRT3u-0CQ', year: 2023, rating: 'R', runtime: '1h 40m', description: 'A family is taken hostage by strangers demanding an unthinkable choice...', score: '86%' },
+            { id: 842942, title: 'Missing', poster: '/tV5H7Uqv5DVd9lE1g6L4qYlHUT8.jpg', youtubeId: 'oQj0XuPZ3UU', year: 2023, rating: 'PG-13', runtime: '1h 51m', description: 'A daughter searches for her missing mother using technology...', score: '88%' },
+            { id: 842675, title: 'The Wandering Earth II', poster: '/pR858ihc6Ls9xohpdRJVjV787ml.jpg', youtubeId: 'mIeYFDBGJ_c', year: 2023, rating: 'PG-13', runtime: '2h 53m', description: 'Humans build massive engines to move Earth away from the dying sun...', score: '89%' },
+            { id: 843794, title: 'JUNG_E', poster: '/z2nfRxZCGFgAnVhb9pZO87TyTX5.jpg', youtubeId: '9W3KeD6sx8U', year: 2023, rating: 'TV-MA', runtime: '1h 38m', description: 'In a post-apocalyptic future, a scientist clones her mother\'s brain...', score: '85%' }
+        ];
+
+        // Featured movie details (for hero section)
+        let featuredMovie = {
+            id: 66732,
+            title: 'Stranger Things',
+            description: 'When a young boy vanishes, a small town uncovers a mystery involving secret experiments, terrifying supernatural forces and one strange little girl.',
+            backdrop: 'https://image.tmdb.org/t/p/original/56v2KjBlU4XaOv9rVYEQypROD7P.jpg',
+            youtubeId: 'b9EkMc79ZSU',
+            year: 2022,
+            rating: 'TV-14',
+            runtime: '3 Seasons',
+            score: '97% Match'
+        };
+        
+        // Initialize the page
+        async function initializePage() {
+            // Set up hero section with featured movie
+            document.getElementById('heroTitle').textContent = featuredMovie.title;
+            document.getElementById('heroDescription').textContent = featuredMovie.description;
+            document.querySelector('.hero').style.backgroundImage = `linear-gradient(to top, #141414 0%, transparent 50%), url(${featuredMovie.backdrop})`;
+            
+            // Set up play button to open YouTube trailer
+            document.getElementById('playBtn').addEventListener('click', () => {
+                window.open(`https://www.youtube.com/watch?v=${featuredMovie.youtubeId}`, '_blank');
+            });
+            
+            // Set up info button to show movie details
+            document.getElementById('infoBtn').addEventListener('click', async () => {
+                await showMovieDetails(featuredMovie);
+            });
+            
+            // Set up modal close button
+            document.getElementById('modalClose').addEventListener('click', () => {
+                document.getElementById('movieModal').style.display = 'none';
+            });
+            
+            // Set up modal play button
+            document.getElementById('modalPlayBtn').addEventListener('click', function() {
+                const youtubeId = this.getAttribute('data-trailer');
+                if (youtubeId) {
+                    window.open(`https://www.youtube.com/watch?v=${youtubeId}`, '_blank');
+                }
+            });
+            
+            // Load all movies
+            await loadAllMovies();
+        }
+        
+        // Load all movies and display them in different sections
+        async function loadAllMovies() {
+            // Show loading spinner
+            document.getElementById('spinner').style.display = 'block';
+            
+            try {
+                // Shuffle movies array
+                const shuffledMovies = [...movies].sort(() => 0.5 - Math.random());
+                
+                // Display movies in different sections
+                displayMoviesInSection(shuffledMovies.slice(0, 10), 'popularMovies');
+                displayMoviesInSection(shuffledMovies.slice(10, 20), 'trendingMovies');
+                displayMoviesInSection(shuffledMovies.slice(20, 30), 'newReleases');
+                
+            } catch (error) {
+                console.error('Error loading movies:', error);
+            } finally {
+                // Hide loading spinner
+                document.getElementById('spinner').style.display = 'none';
+            }
+        }
+        
+        // Display movies in a specific section
+        function displayMoviesInSection(movies, sectionId) {
+            const section = document.getElementById(sectionId);
+            section.innerHTML = '';
+            
+            movies.forEach(movie => {
+                const movieCard = document.createElement('div');
+                movieCard.className = 'movie-card';
+                movieCard.innerHTML = `
+                    <img class="movie-poster" src="https://image.tmdb.org/t/p/w500${movie.poster}" alt="${movie.title}" title="${movie.title}">
+                `;
+                
+                movieCard.addEventListener('click', () => {
+                    showMovieDetails(movie);
+                });
+                
+                section.appendChild(movieCard);
+            });
+        }
+        
+        // Show movie details in modal
+        async function showMovieDetails(movie) {
+            try {
+                // Update modal content
+                document.getElementById('modalTitle').textContent = movie.title;
+                document.getElementById('modalScore').textContent = movie.score || '90% Match';
+                document.getElementById('modalYear').textContent = movie.year || '2023';
+                document.getElementById('modalRating').textContent = movie.rating || 'PG-13';
+                document.getElementById('modalRuntime').textContent = movie.runtime || '2h 00m';
+                document.getElementById('modalDescription').textContent = movie.description || 'No description available';
+                document.getElementById('modalHeader').style.backgroundImage = `url(https://image.tmdb.org/t/p/original${movie.poster})`;
+                document.getElementById('modalPlayBtn').setAttribute('data-trailer', movie.youtubeId);
+                
+                // Show modal
+                document.getElementById('movieModal').style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error showing movie details:', error);
+                alert('Could not load movie details. Please try again later.');
+            }
+        }
+        
+        // Start the application
+        document.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+</body>
+</html>
